@@ -119,11 +119,11 @@ def inject_custom_css():
         /* Hero header */
         .hero-header {{
             background: var(--hero-bg);
-            padding: 6rem 2rem;
+            padding: 1rem 1rem;
             color: var(--text-color);
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             text-align: center;
-            border-radius: 18px;
+            border-radius: 15px;
             border: 1px solid var(--card-border);
         }}
         
@@ -287,10 +287,23 @@ with st.sidebar:
     if nav != st.session_state.page:
         st.session_state.page = nav
         st.rerun()
+
+    # Resume Download Button
+    with open("/workspaces/My_portfolio/Resume_Raghuveera_N.pdf", "rb") as f:
+        resume_bytes = f.read()
+    
+    st.download_button(
+        label="📄 Download Resume",
+        data=resume_bytes,
+        file_name="John_Doe_Data_Scientist_Resume.pdf",
+        mime="application/pdf",
+        key="resume-download",
+        help="Download my full resume in PDF format"
+    )
     
     # Social Links
     st.markdown("""
-    <div style="margin-top: 50px; display: flex; gap: 15px;">
+    <div style="margin-top: 5px; display: flex; gap: 10px;">
         <a href="https://linkedin.com" target="_blank" class="social-link">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
         </a>
@@ -299,6 +312,7 @@ with st.sidebar:
         </a>
     </div>
     """, unsafe_allow_html=True)
+
 
 # --- Main Content ---
 inject_custom_css()
@@ -314,7 +328,7 @@ if st.session_state.page == 'Home':
     
     cols = st.columns([1, 2])
     with cols[0]:
-        st.image("raghu.jpg", use_column_width=True)
+        st.image("raghu.jpg")
     with cols[1]:
         st.subheader("About Me")
         st.write("""
@@ -373,7 +387,7 @@ elif st.session_state.page == 'About':
     
     cols = st.columns([1, 2])
     with cols[0]:
-        st.image("raghu.jpg", use_column_width=True)
+        st.image("raghu.jpg")
     with cols[1]:
         st.subheader("Professional Journey")
         st.write("""
