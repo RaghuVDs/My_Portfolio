@@ -277,7 +277,8 @@ with st.sidebar:
     # Theme Toggle
     current_theme = st.session_state.get('theme', 'dark')
     theme_emoji = '🌙' if current_theme == 'dark' else '☀️'
-    if st.button(f'{theme_emoji} Toggle Theme'):
+    toggle_label = f"({current_theme.capitalize()})"
+    if st.toggle(f'{theme_emoji} {toggle_label}'):
         st.session_state.theme = 'light' if current_theme == 'dark' else 'dark'
         st.rerun()
     
