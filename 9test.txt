@@ -8,29 +8,28 @@ def inject_custom_css():
     <style>
         /* Base styling */
         .stApp {
-            background: #121212;  /* Dark background */
-            color: #ffffff;       /* White text */
+            background: #f5f5f7;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
         
         /* Project cards */
         .project-card {
-            background: #1e1e1e;  /* Dark card background */
+            background: #ffffff;
             border-radius: 18px;
             padding: 25px;
             margin: 15px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            border: 1px solid #333333;
+            border: 1px solid #e0e0e0;
         }
         .project-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
         
         /* Skill bars */
         .skill-bar {
-            background: #333333;  /* Darker skill bar background */
+            background: #e0e0e0;
             border-radius: 12px;
             margin: 15px 0;
             height: 24px;
@@ -50,13 +49,12 @@ def inject_custom_css():
         
         /* Custom header */
         .hero-header {
-            background: linear-gradient(135deg, #2c2c2e 0%, #1c1c1e 100%);
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
             padding: 6rem 2rem;
-            color: #ffffff;       /* White text */
+            color: #1d1d1f;
             margin-bottom: 2rem;
             text-align: center;
-            border-radius: 18px;
-            border: 1px solid #333333;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         /* Interactive buttons */
@@ -75,34 +73,23 @@ def inject_custom_css():
             gap: 8px;
         }
         .apple-button:hover {
-            background: #0063c7;
+            background: #0077ed;
             transform: scale(1.05);
         }
         
         /* Form elements */
         .stTextInput>div>div>input, .stTextArea>div>textarea {
-            background: #1e1e1e !important;
-            color: #ffffff !important;
             border-radius: 12px !important;
             padding: 12px 16px !important;
-            border: 1px solid #333333 !important;
+            border: 1px solid #d2d2d7 !important;
         }
         
         /* Metrics styling */
         .stMetric {
-            background: #1e1e1e;
-            color: #ffffff !important;
+            background: white;
             padding: 20px;
             border-radius: 18px;
-            border: 1px solid #333333;
-        }
-        
-        /* Text colors */
-        h1, h2, h3, h4, h5, h6 {
-            color: #ffffff !important;
-        }
-        p, div {
-            color: #cccccc !important;
+            border: 1px solid #e0e0e0;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -136,19 +123,19 @@ def create_3d_card(content):
 def project_card(project):
     card = f"""
     <div class="project-card">
-        <h3 style="color: #ffffff; margin-bottom: 12px;">{project['project_name']}</h3>
-        <p style="color: #cccccc; line-height: 1.5; margin-bottom: 20px;">{project['description']}</p>
+        <h3 style="color: #1d1d1f; margin-bottom: 12px;">{project['project_name']}</h3>
+        <p style="color: #86868b; line-height: 1.5; margin-bottom: 20px;">{project['description']}</p>
         <div style="margin: 15px 0; display: flex; gap: 8px; flex-wrap: wrap;">
-            {" ".join([f'<span style="background: #333333; color: #ffffff; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #444444;">{tech}</span>' 
+            {" ".join([f'<span style="background: #f5f5f7; color: #1d1d1f; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #d2d2d7;">{tech}</span>' 
                       for tech in project['technologies'].split(', ')])}
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; gap: 20px; color: #999999;">
+            <div style="display: flex; gap: 20px; color: #86868b;">
                 <div>📅 {project['year']}</div>
                 <div>⭐ {project['complexity']}</div>
                 <div>🚀 {project['impact']}</div>
             </div>
-            <button class="apple-button">
+            <button class="apple-button" onclick="alert('Case study coming soon!')">
                 View Details
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-left: 8px;">
                     <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708l2.147-2.146H4.5A.5.5 0 0 1 4 8z"/>
