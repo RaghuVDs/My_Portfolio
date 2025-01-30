@@ -1,6 +1,11 @@
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
+import re
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
 
 # --- Custom CSS ---
 def inject_custom_css():
@@ -191,6 +196,24 @@ def inject_custom_css():
         .social-link:hover {{
             color: var(--button-bg) !important;
         }}
+
+        /* Error/Success Messages */
+        .stAlert {{
+            margin-top: 1rem !important;
+            border-radius: 12px !important;
+        }}
+
+        .stAlert .st-emotion-cache-1m7p7fa {{
+            background-color: #ff444430 !important;
+            border: 1px solid #ff4444 !important;
+            color: var(--text-color) !important;
+        }}
+
+        .stAlert .st-emotion-cache-1vzeuhh {{
+            background-color: #00C85130 !important;
+            border: 1px solid #00C851 !important;
+            color: var(--text-color) !important;
+        }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -255,6 +278,46 @@ def skill_bar(name, level):
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+def send_email(name, email, message):
+    """Send email using SMTP (Gmail example)"""
+    try:
+        # Create message
+        msg = MIMEMultipart()
+        msg['Subject'] = f"New message from {name} - Data Portfolio Contact"
+        msg['From'] = st.secrets["email"]["smtp_user"]
+        msg['To'] = st.secrets["email"]["recipient"]
+        
+        # Create HTML body
+        html = f"""
+        <html>
+            <body>
+                <h3>New Contact Form Submission</h3>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Email:</strong> {email}</p>
+                <p><strong>Message:</strong></p>
+                <p>{message}</p>
+            </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html, 'html'))
+        
+        # Connect to SMTP server
+        with smtplib.SMTP_SSL(
+            st.secrets["email"]["smtp_server"],
+            st.secrets["email"]["smtp_port"]
+        ) as server:
+            server.login(
+                st.secrets["email"]["smtp_user"],
+                st.secrets["email"]["smtp_password"]
+            )
+            server.send_message(msg)
+        
+        return True
+    except Exception as e:
+        st.error(f"Error sending email: {str(e)}")
+        return False
 
 # --- Page Config ---
 st.set_page_config(
@@ -406,20 +469,82 @@ elif st.session_state.page == 'About':
     with cert_cols[2]:
         st.image("raghu.jpg", caption="Databricks Engineer")
 
+    
+
 elif st.session_state.page == 'Contact':
     st.title("Get in Touch")
+
+    # Email validation regex pattern
+    EMAIL_PATTERN = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     
+    # Initialize session state keys
+    if 'contact_submitted' not in st.session_state:
+        st.session_state.contact_submitted = False
+        st.session_state.form_data = {
+            'name': '',
+            'email': '',
+            'message': ''
+        }
+
+    # Reset form after successful submission
+    if st.session_state.contact_submitted:
+        st.session_state.form_data = {'name': '', 'email': '', 'message': ''}
+        st.session_state.contact_submitted = False
+        st.rerun()  # Force UI refresh after clearing
+
     with st.form("contact_form"):
-        cols = st.columns(2)
-        with cols[0]:
-            name = st.text_input("Name", placeholder="John Smith")
-            email = st.text_input("Email", placeholder="john@example.com")
-        with cols[1]:
-            message = st.text_area("Message", height=150)
+        # Create form fields with dedicated keys
+        name = st.text_input(
+            "Name",
+            placeholder="John Smith",
+            key="form_name",
+            value=st.session_state.form_data['name']
+        )
+        email = st.text_input(
+            "Email", 
+            placeholder="john@example.com",
+            key="form_email",
+            value=st.session_state.form_data['email']
+        )
+        message = st.text_area(
+            "Message", 
+            height=150,
+            key="form_message",
+            value=st.session_state.form_data['message']
+        )
         
-        if st.form_submit_button("Send Message", type="primary"):
-            st.success("🚀 Message sent successfully!")
-            st.balloons()
+        submitted = st.form_submit_button("Send Message", type="primary")
+        
+        if submitted:
+            # Store values in temporary session state
+            st.session_state.form_data.update({
+                'name': name,
+                'email': email,
+                'message': message
+            })
+            
+            # Validate inputs
+            validation_passed = True
+            if not name.strip():
+                st.error("🚨 Please enter your name")
+                validation_passed = False
+            if not email.strip() or not re.match(EMAIL_PATTERN, email):
+                st.error("📧 Please enter a valid email address")
+                validation_passed = False
+            if not message.strip():
+                st.error("💬 Please enter your message")
+                validation_passed = False
+
+            if validation_passed:
+                # Attempt to send email
+                with st.spinner("Sending message..."):
+                    if send_email(name, email, message):
+                        st.success("🚀 Message sent successfully!")
+                        st.balloons()
+                        # Set flag and clear form data
+                        st.session_state.contact_submitted = True
+                    else:
+                        st.error("❌ Failed to send message. Please try again later.")
     
     st.divider()
     
