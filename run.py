@@ -45,8 +45,8 @@ df_testimonials = pd.DataFrame({
     ]
 })
 
-profile_image = "your_profile_picture.jpg"
-resume_file = "your_resume.pdf"
+profile_image = "My_portfolio/raghu.jpg"
+resume_file = "My_portfolio/Resume_Raghuveera_N.pdf"
 
 # --- Helper Functions ---
 def load_project_page(project_name):
