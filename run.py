@@ -10,6 +10,8 @@ import glob
 import frontmatter  # pip install python-frontmatter
 from datetime import datetime
 from dateutil import parser
+import plotly.express as px
+import plotly.graph_objects as go
 
 # --- Custom CSS ---
 def inject_custom_css():
@@ -250,6 +252,17 @@ def inject_custom_css():
             background: var(--card-bg) !important;
             border: 1px solid var(--card-border) !important;
         }}
+
+        /* Radar chart styling */
+        .js-plotly-plot .plotly .main-svg {{
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+        }}
+
+        .js-plotly-plot .plotly .polar-radialaxis-tick {{
+            fill: var(--text-color) !important;
+        }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -466,6 +479,53 @@ elif st.session_state.page == 'Projects':
 elif st.session_state.page == 'Skills':
     st.title("Technical Expertise")
     
+    # Radar Chart Data
+    skill_categories = {
+        'Python': 90,
+        'Data Analysis': 85,
+        'Machine Learning': 88,
+        'Data Visualization': 82,
+        'Cloud Technologies': 75,
+        'Big Data': 70
+    }
+    
+    # Create radar chart
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatterpolar(
+        r=list(skill_categories.values()),
+        theta=list(skill_categories.keys()),
+        fill='toself',
+        name='Skill Level',
+        fillcolor='rgba(0, 113, 227, 0.4)',
+        line=dict(color='#0071e3')
+    ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                tickfont=dict(color='var(--text-color)'),
+                gridcolor='var(--card-border)'
+            ),
+            angularaxis=dict(
+                gridcolor='var(--card-border)',
+                linecolor='var(--card-border)',
+                tickfont=dict(color='var(--text-color)')
+            )
+        ),
+        showlegend=False,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        height=500,
+        margin=dict(l=50, r=50, b=50, t=50)
+    )
+    
+    # Display radar chart
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Existing skill bars
     st.subheader("Machine Learning")
     skill_bar("Python", 90)
     skill_bar("TensorFlow", 80)
