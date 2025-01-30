@@ -6,6 +6,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
+import glob
+import frontmatter  # pip install python-frontmatter
+from datetime import datetime
+from dateutil import parser
 
 # --- Custom CSS ---
 def inject_custom_css():
@@ -214,6 +218,38 @@ def inject_custom_css():
             border: 1px solid #00C851 !important;
             color: var(--text-color) !important;
         }}
+
+        /* Blog specific styling */
+        .stExpander {{
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 12px !important;
+            margin-bottom: 1rem;
+        }}
+
+        .stExpander .st-emotion-cache-1qg05tj {{
+            color: var(--text-color) !important;
+            font-size: 1.2rem !important;
+        }}
+
+        .post-date {{
+            color: var(--text-muted) !important;
+            font-size: 0.9rem !important;
+        }}
+
+        .post-tag {{
+            background: var(--tag-bg) !important;
+            border: 1px solid var(--tag-border) !important;
+            padding: 4px 12px !important;
+            border-radius: 20px !important;
+            font-size: 0.8rem !important;
+        }}
+
+        .stCodeBlock pre {{
+            border-radius: 12px !important;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+        }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -345,8 +381,8 @@ with st.sidebar:
         st.session_state.theme = 'light' if current_theme == 'dark' else 'dark'
         st.rerun()
     
-    # Navigation
-    nav = st.radio("Navigation", ["Home", "Projects", "Skills", "About", "Contact"])
+    # Add to navigation radio in sidebar
+    nav = st.radio("Navigation", ["Home", "Projects", "Skills", "About", "Contact", "Blog"])
     if nav != st.session_state.page:
         st.session_state.page = nav
         st.rerun()
@@ -588,3 +624,88 @@ elif st.session_state.page == 'Contact':
             """<iframe src="https://www.google.com/maps/embed?pb=..."></iframe>""",
             height=300
         )
+
+elif st.session_state.page == 'Blog':
+    st.title("Technical Writings")
+    
+    # Load blog posts with proper path handling
+    posts = []
+    blog_dir = os.path.join(os.path.dirname(__file__), "blog_posts")
+    
+    try:
+        for file in glob.glob(os.path.join(blog_dir, "*.md")):
+            try:
+                post = frontmatter.load(file)
+                # Convert date string to datetime object if needed
+                post_date = post.metadata.get('date', datetime.now())
+                if isinstance(post_date, str):
+                    from dateutil import parser
+                    post_date = parser.parse(post_date)
+                
+                posts.append({
+                    "title": post.metadata.get('title', 'Untitled'),
+                    "date": post_date,
+                    "category": post.metadata.get('category', 'General'),
+                    "tags": post.metadata.get('tags', []),
+                    "content": post.content,
+                    "interactive": post.metadata.get('interactive', False),
+                    "metadata": post.metadata
+                })
+            except Exception as e:
+                st.error(f"Error loading post {os.path.basename(file)}: {str(e)}")
+                
+    except Exception as e:
+        st.error(f"Could not access blog directory: {str(e)}")
+    
+    # Sort posts by date
+    posts.sort(key=lambda x: x['date'], reverse=True)
+    
+    # Blog layout
+    col1, col2 = st.columns([3, 1])
+    
+    with col2:
+        st.subheader("Filter Posts")
+        selected_category = st.selectbox(
+            "Category",
+            ["All"] + list(sorted({p['category'] for p in posts}))
+        )
+        search_query = st.text_input("Search posts")
+        
+    with col1:
+        if not posts:
+            st.info("📭 No blog posts found. Check back later!")
+            st.stop()  # This will stop further execution of the blog section
+
+        for post in posts:
+            if selected_category != "All" and post['category'] != selected_category:
+                continue
+                
+            if search_query.lower() not in post['content'].lower():
+                continue
+            
+            with st.expander(f"{post['title']} ({post['date'].strftime('%b %Y')})"):
+                st.markdown(f"""
+                **{post['category']}** · {", ".join(post['tags'])}
+                """)
+                
+                # Render Markdown content with proper image paths
+                st.markdown(post['content'].replace('](images/', '](blog_posts/images/'))
+                
+                # Add interactive elements
+                if post['interactive']:
+                    st.divider()
+                    if "plot" in post['metadata']:
+                        try:
+                            fig = px.line(**post['metadata']['plot'])
+                            st.plotly_chart(fig)
+                        except Exception as e:
+                            st.error(f"Could not render plot: {str(e)}")
+                            
+                    if "code" in post['metadata']:
+                        try:
+                            st.code(
+                                post['metadata']['code']['content'], 
+                                language=post['metadata']['code'].get('language', 'python')
+                            )
+                        except Exception as e:
+                            st.error(f"Could not render code block: {str(e)}")
