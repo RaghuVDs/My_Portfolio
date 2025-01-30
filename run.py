@@ -1,197 +1,243 @@
 import streamlit as st
 import pandas as pd
+import streamlit.components.v1 as components
 
-# --- Data and Assets (Replace with your actual data) ---
-# Example Project Data
+# --- Custom CSS ---
+def inject_custom_css():
+    st.markdown("""
+    <style>
+        /* Base styling */
+        .stApp {
+            background:rgb(106, 166, 251);
+        }
+        
+        /* Project cards */
+        .project-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Skill bars */
+        .skill-bar {
+            background:rgba(247, 121, 115, 0);
+            border-radius: 20px;
+            margin: 10px 0;
+        }
+        .skill-progress {
+            background: #4CAF50;
+            height: 20px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        /* Custom header */
+        .hero-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            padding: 4rem 2rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- Data and Assets ---
+# (Keep your existing data, but add more details)
 df_projects = pd.DataFrame({
-    'project_name': ['Customer Churn Prediction', 'Sales Forecasting', 'Sentiment Analysis of Product Reviews'],
-    'description': [
-        'Developed a machine learning model to predict customer churn for a telecommunications company.',
-        'Built a time series model to forecast future sales.',
-        'Performed sentiment analysis on customer reviews.'
-    ],
-    'technologies': ['Python, scikit-learn', 'Python, Statsmodels', 'Python, NLTK'],
+    'project_name': ['Customer Churn Prediction', 'Sales Forecasting', 'Sentiment Analysis'],
+    'description': ['...', '...', '...'],
+    'technologies': ['Python, scikit-learn, XGBoost', 'Python, Prophet, ARIMA', 'Python, BERT, Transformers'],
     'year': [2023, 2022, 2023],
-    'project_page_link': ['project_1', 'project_2', 'project_3'],
-    'case_study_link': ['case_study_1', 'case_study_2', 'case_study_3']
+    'complexity': ['Advanced', 'Intermediate', 'Advanced'],
+    'impact': ['Reduced churn by 15%', 'Improved forecast accuracy by 20%', 'Automated review analysis']
 })
 
-# Simplified other data for example
-df_skills = pd.DataFrame({
-    'skill_category': ['Programming Languages', 'Machine Learning'],
-    'skills': [
-        ['Python', 'SQL'],
-        ['Supervised Learning', 'Deep Learning']
-    ]
-})
+# --- Helper Components ---
+def project_card(project):
+    card = f"""
+    <div class="project-card">
+        <h3>{project['project_name']}</h3>
+        <p>{project['description']}</p>
+        <div style="margin: 10px 0;">
+            {" ".join([f'<span class="badge" style="background: #4CAF50; color: white; padding: 5px 10px; border-radius: 20px; margin: 2px;">{tech}</span>' for tech in project['technologies'].split(', ')])}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="color: #666;">📅 {project['year']}</span>
+                <span style="margin-left: 15px; color: #666;">🏆 {project['complexity']}</span>
+            </div>
+            <button onclick="alert('Coming soon!')" style="background: #6366f1; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer;">
+                View Case Study →
+            </button>
+        </div>
+    </div>
+    """
+    st.markdown(card, unsafe_allow_html=True)
 
-# --- Page Configuration ---
+def skill_bar(name, level):
+    st.markdown(f"""
+    <div class="skill-bar">
+        <div class="skill-progress" style="width: {level}%;">
+            {name} - {level}%
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- Page Config ---
 st.set_page_config(
-    page_title="Data Portfolio",
-    page_icon="📊",
+    page_title="Data Portfolio | John Doe",
+    page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- Session State Management ---
+# --- Session State ---
 if 'page' not in st.session_state:
-    st.session_state.page = 'Home'  # Match case with navigation options
+    st.session_state.page = 'Home'
 
-# --- Sidebar Navigation ---
+# --- Sidebar ---
 with st.sidebar:
-    st.image("raghu.jpg", width=250)  # Ensure this image exists
-    st.title("Navigation")
+    st.image("raghu.jpg", width=250)
+    st.title("John Doe")
+    st.caption("Data Scientist | ML Engineer")
     
-    # Define navigation options with consistent casing
-    nav_options = ["Home", "Portfolio", "About Me", "Skills", "Contact"]
-    page = st.radio("Go to", nav_options)
-    
-    # Update session state if navigation changes
-    if page != st.session_state.page:
-        st.session_state.page = page
+    nav = st.radio("Navigation", ["Home", "Projects", "Skills", "About", "Contact"])
+    if nav != st.session_state.page:
+        st.session_state.page = nav
         st.rerun()
     
-    # Resume download
-    with open("Resume_Raghuveera_N.pdf", "rb") as f:
-        st.download_button(
-            "📄 Download Resume",
-            f.read(),
-            "Your_Resume.pdf",
-            "application/pdf"
-        )
+    # Social Links
+    st.markdown("""
+    <div style="margin-top: 50px;">
+        <a href="https://linkedin.com" target="_blank" style="margin-right: 15px; color: #0A66C2;">LinkedIn</a>
+        <a href="https://github.com" target="_blank" style="margin-right: 15px; color: #333;">GitHub</a>
+        <a href="https://medium.com" target="_blank" style="color: #000;">Blog</a>
+    </div>
+    """, unsafe_allow_html=True)
 
-# --- Page Content ---
+# --- Main Content ---
+inject_custom_css()
 
-# Home Page
 if st.session_state.page == 'Home':
-    st.title("Welcome to My Data Portfolio")
-    st.write("### John Doe - Data Scientist")
+    # Hero Section
+    st.markdown("""
+    <div class="hero-header">
+        <h1 style="color: white; margin: 0;">Turning Data Into Decisions</h1>
+        <p style="font-size: 1.2rem;">Data Scientist specializing in Machine Learning & Business Intelligence</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    st.write("""
-    I'm a data professional with expertise in machine learning and data analysis.
-    This portfolio showcases my projects and skills.
-    """)
-    
-    # Use column layout for better organization
-    col1, col2 = st.columns([1, 2])
-    with col1:
+    cols = st.columns([1, 2])
+    with cols[0]:
         st.image("raghu.jpg", use_column_width=True)
-    with col2:
+    with cols[1]:
+        st.subheader("About Me")
         st.write("""
-        **Key Expertise:**
-        - Machine Learning
-        - Data Visualization
-        - Predictive Modeling
+        Experienced data professional with 5+ years in delivering impactful ML solutions.
+        Passionate about solving complex business problems through data-driven approaches.
         """)
-    
-    if st.button("View My Work →", type="primary"):
-        st.session_state.page = "Portfolio"
-        st.rerun()
+        st.metric("Years Experience", "5+", "+3 certifications")
+        st.metric("Projects Completed", "27", "8 active")
+        
+    st.subheader("Featured Projects")
+    for _, proj in df_projects.iterrows():
+        project_card(proj)
 
-# Portfolio Page
-elif st.session_state.page == 'Portfolio':
+elif st.session_state.page == 'Projects':
     st.title("Project Portfolio")
     
-    # Project filtering
-    tech_options = list(set(df_projects['technologies'].str.split(', ').sum()))
-    selected_tech = st.multiselect("Filter by technologies:", tech_options)
+    # Filters
+    col1, col2 = st.columns(2)
+    with col1:
+        tech_filter = st.multiselect("Filter by Technology", 
+                                   options=['Python', 'scikit-learn', 'Prophet', 'BERT'])
+    with col2:
+        search_query = st.text_input("Search Projects")
     
-    # Filter projects
-    filtered_projects = df_projects
-    if selected_tech:
-        filtered_projects = df_projects[
-            df_projects['technologies'].apply(
-                lambda techs: any(t in techs for t in selected_tech)
-            )
-        ]
+    # Filtered projects
+    filtered = df_projects.copy()
+    if tech_filter:
+        filtered = filtered[filtered['technologies'].apply(lambda x: any(t in x for t in tech_filter))]
+    if search_query:
+        filtered = filtered[filtered['project_name'].str.contains(search_query, case=False)]
     
     # Display projects
-    for _, project in filtered_projects.iterrows():
-        with st.expander(project['project_name'], expanded=False):
-            st.write(f"**Description:** {project['description']}")
-            st.write(f"**Technologies:** {project['technologies']}")
-            st.write(f"**Year:** {project['year']}")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button(f"Details: {project['project_name']}"):
-                    st.session_state.page = project['project_page_link']
-                    st.rerun()
-            with col2:
-                if st.button(f"Case Study: {project['project_name']}"):
-                    st.session_state.page = project['case_study_link']
-                    st.rerun()
+    for _, proj in filtered.iterrows():
+        project_card(proj)
 
-# Project Details Pages
-elif st.session_state.page in df_projects['project_page_link'].values:
-    project = df_projects[df_projects['project_page_link'] == st.session_state.page].iloc[0]
+elif st.session_state.page == 'Skills':
+    st.title("Technical Expertise")
     
-    st.title(project['project_name'])
-    st.image(f"projects/{project['project_page_link']}.jpg", use_column_width=True)
+    st.subheader("Machine Learning")
+    skill_bar("Python", 90)
+    skill_bar("TensorFlow", 80)
+    skill_bar("Natural Language Processing", 75)
     
-    st.header("Project Overview")
-    st.write(project['description'])
+    st.subheader("Data Engineering")
+    skill_bar("SQL", 85)
+    skill_bar("Spark", 70)
+    skill_bar("Airflow", 65)
     
-    st.write("**Technologies Used:**")
-    st.write(project['technologies'])
-    
-    if st.button("← Back to Portfolio"):
-        st.session_state.page = "Portfolio"
-        st.rerun()
+    st.subheader("Visualization")
+    skill_bar("Tableau", 88)
+    skill_bar("Power BI", 75)
+    skill_bar("Matplotlib", 82)
 
-# About Me Page
-elif st.session_state.page == 'About Me':
+elif st.session_state.page == 'About':
     st.title("About Me")
     
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        st.image("raghu.jpg", width=200)
-    with col2:
+    cols = st.columns([1, 2])
+    with cols[0]:
+        st.image("raghu.jpg", use_column_width=True)
+    with cols[1]:
+        st.subheader("Professional Journey")
         st.write("""
-        ## John Doe
-        **Data Scientist** with 5+ years of experience...
+        - 🎓 MSc in Data Science, Stanford University (2018)
+        - 💼 Senior Data Scientist @ TechCorp (2020-Present)
+        - 🏆 AWS Machine Learning Certified
+        - 📈 Built predictive models serving 1M+ users
         """)
     
-    st.write("""
-    ### Professional Journey
-    - MSc in Data Science
-    - Certified Machine Learning Specialist
-    - Experience in multiple industries
-    """)
+    st.subheader("Certifications")
+    cert_cols = st.columns(3)
+    with cert_cols[0]:
+        st.image("raghu.jpg", caption="AWS ML Specialty")
+    with cert_cols[1]:
+        st.image("raghu.jpg", caption="Google Cloud Professional")
+    with cert_cols[2]:
+        st.image("raghu.jpg", caption="Databricks Engineer")
 
-# Skills Page
-elif st.session_state.page == 'Skills':
-    st.title("Technical Skills")
-    
-    for _, category in df_skills.iterrows():
-        st.subheader(category['skill_category'])
-        cols = st.columns(4)
-        for i, skill in enumerate(category['skills']):
-            cols[i % 4].markdown(f"- {skill}")
-
-# Contact Page
 elif st.session_state.page == 'Contact':
     st.title("Get in Touch")
     
     with st.form("contact_form"):
-        name = st.text_input("Name")
-        email = st.text_input("Email")
-        message = st.text_area("Message")
+        cols = st.columns(2)
+        with cols[0]:
+            name = st.text_input("Name", placeholder="John Smith")
+            email = st.text_input("Email", placeholder="john@example.com")
+        with cols[1]:
+            message = st.text_area("Message", height=150)
         
-        if st.form_submit_button("Send Message"):
-            # Add your email handling logic here
-            st.success("Message sent successfully!")
-
-    st.write("""
-    **Alternative Contact Methods:**
-    - 📧 email@example.com
-    - 🔗 [LinkedIn Profile](https://linkedin.com)
-    - 📍 Location: City, Country
+        if st.form_submit_button("Send Message", type="primary"):
+            st.success("🚀 Message sent successfully!")
+            st.balloons()
+    
+    st.divider()
+    st.subheader("Direct Contact")
+    st.write("📧 john.doe@dataportfolio.com")
+    st.write("📱 +1 (555) 123-4567")
+    st.write("📍 San Francisco, CA")
+    
+    # Embed Map
+    components.html("""
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100940.17073741354!2d-122.50764081392592!3d37.75767927538934!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1718146464298!5m2!1sen!2sus" 
+        width="100%" height="300" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy"></iframe>
     """)
-
-# Handle unknown pages
-else:
-    st.error("Page not found")
-    if st.button("Return to Home"):
-        st.session_state.page = "Home"
-        st.rerun()
