@@ -422,7 +422,7 @@ with st.sidebar:
         st.rerun()
 
     # Resume Download Button
-    with open("/workspaces/My_portfolio/Resume_Raghuveera_N.pdf", "rb") as f:
+    with open("Resume_Raghuveera_N.pdf", "rb") as f:
         resume_bytes = f.read()
     
     st.download_button(
@@ -899,7 +899,7 @@ elif st.session_state.page == 'Professional Experience':
     
     with col2:
         st.subheader("Download Resume")
-        with open("/workspaces/My_portfolio/Resume_Raghuveera_N.pdf", "rb") as f:
+        with open("Resume_Raghuveera_N.pdf", "rb") as f:
             resume_bytes = f.read()
             st.download_button(
                 label="📄 Download Full Resume",
