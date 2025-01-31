@@ -263,6 +263,27 @@ def inject_custom_css():
         .js-plotly-plot .plotly .polar-radialaxis-tick {{
             fill: var(--text-color) !important;
         }}
+
+        /* TimelineJS Customization */
+        .tl-timeline {{
+            background: var(--card-bg) !important;
+            border-radius: 18px !important;
+            padding: 20px !important;
+            border: 1px solid var(--card-border) !important;
+        }}
+
+        .tl-text {{
+            color: var(--text-color) !important;
+            background: var(--card-bg) !important;
+        }}
+
+        .tl-timemarker-media-container {{
+            background: var(--button-bg) !important;
+        }}
+
+        .tl-menubar {{
+            background: var(--card-bg) !important;
+        }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -395,7 +416,7 @@ with st.sidebar:
         st.rerun()
     
     # Add to navigation radio in sidebar
-    nav = st.radio("Navigation", ["Home", "Projects", "Skills", "About", "Contact", "Blog"])
+    nav = st.radio("Navigation", ["Home", "Professional Experience",  "Projects", "Skills", "About", "Contact", "Blog"])
     if nav != st.session_state.page:
         st.session_state.page = nav
         st.rerun()
@@ -769,3 +790,127 @@ elif st.session_state.page == 'Blog':
                             )
                         except Exception as e:
                             st.error(f"Could not render code block: {str(e)}")
+
+# Add experience page handler
+elif st.session_state.page == 'Professional Experience':
+    st.title("Professional Journey")
+    
+    # Timeline data
+    timeline_data = [
+        {
+            "start_date": "2020-07",
+            "end_date": "Present",
+            "title": "Senior Data Scientist",
+            "company": "Tech Corp Inc",
+            "description": """Led ML initiatives across 3 product teams. 
+            - Scaled real-time recommendation system to 1M+ users
+            - Reduced inference latency by 40% through model optimization
+            - Mentored 5 junior data scientists""",
+            "icon": "🚀"
+        },
+        {
+            "start_date": "2018-06",
+            "end_date": "2020-06",
+            "title": "Data Scientist",
+            "company": "Data Insights LLC",
+            "description": """Built predictive maintenance models for IoT devices.
+            - Developed anomaly detection system with 92% accuracy
+            - Automated ETL pipelines serving 100+ daily reports
+            - Implemented CI/CD for ML models""",
+            "icon": "📈"
+        },
+        {
+            "start_date": "2016-09",
+            "end_date": "2018-05",
+            "title": "Junior Data Analyst",
+            "company": "StartUp Ventures",
+            "description": """Created business intelligence dashboards.
+            - Reduced reporting time by 70% through automation
+            - Performed customer segmentation analysis
+            - Developed SQL training program for team""",
+            "icon": "🔍"
+        }
+    ]
+    
+    # Generate TimelineJS HTML
+    # Update the timeline data generation section
+    timeline_html = f"""
+    <link href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css" rel="stylesheet">
+    <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+
+    <div id='timeline-embed' style="width: 95%; height: 600px; margin: 0 auto"></div>
+
+    <script>
+        var timelineData = {{
+            "title": {{
+                "media": {{
+                    "url": "",
+                    "caption": "",
+                    "credit": ""
+                }},
+                "text": {{
+                    "headline": "Professional Timeline",
+                    "text": "<p>Career progression and key achievements</p>"
+                }}
+            }},
+            "events": [
+                {','.join([f"""
+                {{
+                    "start_date": {{"year": "{e['start_date'].split('-')[0]}", "month": "{e['start_date'].split('-')[1]}"}},
+                    "end_date": {{"year": "{datetime.now().year if e['end_date'] == 'Present' else e['end_date'].split('-')[0]}", "month": "{datetime.now().month if e['end_date'] == 'Present' else e['end_date'].split('-')[1] if '-' in e['end_date'] else '01'}"}},
+                    "text": {{
+                        "headline": "{e['icon']} {e['title']} · {e['company']}",
+                        "text": "<p>{e['description'].replace('\n', '<br>')}</p>"
+                    }},
+                    "background": {{"color": "#ffffff"}}
+                }}
+                """ for e in timeline_data])}
+            ]
+        }};
+        
+        window.timeline = new TL.Timeline('timeline-embed', timelineData);
+    </script>
+    """
+    
+    # Render timeline
+    components.html(timeline_html, height=650)
+    
+    # Add downloadable resume section
+    st.markdown("---")
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.subheader("Detailed Experience")
+        st.markdown("""
+        **Senior Data Scientist** @ Tech Corp Inc (2020-Present)  
+        - Led cross-functional ML initiatives impacting 1M+ users
+        - Optimized model serving infrastructure reducing costs by 35%
+        - Introduced MLOps practices across 3 product teams
+        
+        **Data Scientist** @ Data Insights LLC (2018-2020)  
+        - Developed predictive maintenance system with 92% accuracy
+        - Automated ETL pipelines processing 10TB+ daily
+        - Implemented model monitoring framework
+        
+        **Junior Data Analyst** @ StartUp Ventures (2016-2018)  
+        - Built BI dashboards used by 50+ executives
+        - Performed customer segmentation analysis
+        - Reduced reporting time by 70% through automation
+        """)
+    
+    with col2:
+        st.subheader("Download Resume")
+        with open("/workspaces/My_portfolio/Resume_Raghuveera_N.pdf", "rb") as f:
+            resume_bytes = f.read()
+            st.download_button(
+                label="📄 Download Full Resume",
+                data=f,
+                file_name="Resume_Raghuveera_N.pdf",
+                mime="application/pdf"
+            )
+        st.markdown("""
+        **Core Competencies:**
+        - Machine Learning Engineering
+        - Data Pipeline Architecture
+        - Cloud Infrastructure (AWS/GCP)
+        - Team Leadership & Mentoring
+        """)
