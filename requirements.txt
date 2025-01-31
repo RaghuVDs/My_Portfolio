@@ -1,9 +1,5 @@
 streamlit
 pandas
-streamlit-components
-re
-smtplib
-email
 python-frontmatter
 python-dateutil
 plotly
