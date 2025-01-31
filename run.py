@@ -284,6 +284,115 @@ def inject_custom_css():
         .tl-menubar {{
             background: var(--card-bg) !important;
         }}
+
+        /* Certification Card */
+        .certification-card {{
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }}
+
+        .certification-card:hover {{
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }}
+
+        /* Certification Header */
+        .cert-header {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }}
+
+        /* Certification Badge */
+        .cert-badge {{
+            flex-shrink: 0;
+        }}
+
+        .cert-badge img {{
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            border: 2px solid var(--card-border);
+            padding: 5px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }}
+
+        /* Certification Info */
+        .cert-info {{
+            flex: 1;
+        }}
+
+        .cert-header h3 {{
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }}
+
+        /* Certification Meta */
+        .cert-meta {{
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin: 0.5rem 0;
+        }}
+
+        .cert-issuer {{
+            font-weight: 500;
+            color: var(--text-color);
+            background: var(--tag-bg);
+            padding: 0.25rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }}
+
+        .cert-id {{
+            font-size: 0.9rem;
+            color: var(--text-muted) !important;
+            margin: 0.5rem 0 !important;
+        }}
+
+        /* Certification Date */
+        .cert-date {{
+            background: var(--tag-bg);
+            color: var(--text-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }}
+
+        /* Certification Description */
+        .cert-body p {{
+            margin: 0.5rem 0;
+            color: var(--text-muted);
+        }}
+
+        /* Certification Button */
+        .certification-button {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--button-bg);
+            color: white !important;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            text-decoration: none !important;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }}
+
+        .certification-button:hover {{
+            background: var(--button-hover);
+            transform: scale(1.02);
+            color: white !important;
+        }}
+
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -416,7 +525,7 @@ with st.sidebar:
         st.rerun()
     
     # Add to navigation radio in sidebar
-    nav = st.radio("Navigation", ["Home", "Professional Experience",  "Projects", "Skills", "About", "Contact", "Blog"])
+    nav = st.radio("Navigation", ["Home", "Professional Experience",  "Projects", "Skills", "Certifications", "Contact", "Blog"])
     if nav != st.session_state.page:
         st.session_state.page = nav
         st.rerun()
@@ -562,29 +671,56 @@ elif st.session_state.page == 'Skills':
     skill_bar("Power BI", 75)
     skill_bar("Matplotlib", 82)
 
-elif st.session_state.page == 'About':
-    st.title("About Me")
+# Remove the About page handler and add Certifications
+elif st.session_state.page == 'Certifications':
+    st.title("Professional Certifications")
     
-    cols = st.columns([1, 2])
-    with cols[0]:
-        st.image("raghu.jpg")
-    with cols[1]:
-        st.subheader("Professional Journey")
-        st.write("""
-        - 🎓 MSc in Data Science, Stanford University (2018)
-        - 💼 Senior Data Scientist @ TechCorp (2020-Present)
-        - 🏆 AWS Machine Learning Certified
-        - 📈 Built predictive models serving 1M+ users
-        """)
-    
-    st.subheader("Certifications")
-    cert_cols = st.columns(3)
-    with cert_cols[0]:
-        st.image("raghu.jpg", caption="AWS ML Specialty")
-    with cert_cols[1]:
-        st.image("raghu.jpg", caption="Google Cloud Professional")
-    with cert_cols[2]:
-        st.image("raghu.jpg", caption="Databricks Engineer")
+    # Update the certifications data structure
+    certs = [
+        {
+            "title": "AWS Certified Machine Learning - Specialty",
+            "issuer": "Amazon Web Services",
+            "date": "2023",
+            "credential_id": "AWS123456",
+            "verify_url": "https://www.credly.com/cert/...",
+            "badge_url": "https://images.credly.com/size/680x680/images/...aws.png"  # New field
+        },
+        {
+            "title": "Google Cloud Professional Data Engineer",
+            "issuer": "Google Cloud",
+            "date": "2022",
+            "credential_id": "GCP789012",
+            "verify_url": "https://www.credential.net/...",
+            "badge_url": "https://www.credly.com/sharer/...gcp-badge.png"
+        },
+    ]
+
+    # Update the certification card HTML
+    for cert in certs:
+        with st.container():
+            st.markdown(f"""
+            <div class="certification-card">
+                <div class="cert-header">
+                    <div class="cert-badge">
+                        <img src="{cert['badge_url']}" alt="{cert['title']} badge">
+                    </div>
+                    <div class="cert-info">
+                        <h3>{cert['title']}</h3>
+                        <div class="cert-meta">
+                            <span class="cert-issuer">{cert['issuer']}</span>
+                            <span class="cert-date">{cert['date']}</span>
+                        </div>
+                        <p class="cert-id">Credential ID: {cert['credential_id']}</p>
+                    </div>
+                </div>
+                <a href="{cert['verify_url']}" target="_blank" class="certification-button">
+                    Verify Credential
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+                    </svg>
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
 
     
 
